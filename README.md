@@ -5,12 +5,13 @@ tests, useful diagnostics, and eventually a results dashboard.
 
 ## Current milestone
 
-Seven SauceDemo authentication scenarios using Python, Pytest, and Playwright:
+Eight SauceDemo UI scenarios using Python, Pytest, and Playwright:
 
 - Successful login and navigation to Products
 - Invalid username and invalid password
 - Locked user
 - Empty username, empty password, and both fields empty
+- Add a product to the cart, checking its name, price, badge count, and quantity
 
 The original `test_example.py` remains the initial Python.org smoke test.
 
@@ -38,6 +39,27 @@ To run the original smoke test too:
 ```powershell
 .\.venv\Scripts\python.exe -m pytest -v
 ```
+
+## Run the cart workflow
+
+After setting the same environment variables, watch the new test:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/ui/test_cart.py -v --headed --slowmo 500
+```
+
+Expected result: **1 passed**. It logs in independently, checks the Sauce Labs
+Backpack costs $29.99, adds it, and verifies one matching item in the cart.
+The browser closes automatically; no purchase is made.
+
+Run authentication and cart tests together:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/ui -v
+```
+
+Expected result: **8 passed**, or **9 passed** with `python -m pytest -v`,
+which includes the original Python.org smoke test.
 
 ## Watch the browser
 
@@ -84,6 +106,11 @@ retry until the expected state appears or their timeout expires; there are no
 fixed sleeps. Rejected logins check both the error message and that the user
 remains on the login page.
 
+The cart test demonstrates state transition testing: an empty cart becomes a cart
+containing one specific product. It scopes actions to the product's card, uses
+SauceDemo's `data-test` attributes where accessible roles are insufficient, and
+checks fixed expected values rather than deriving expectations from the UI.
+
 Page Object Model will be introduced when reuse across workflows justifies it.
 This suite depends on a public external site, so network outages and site changes
 can cause failures that need diagnosis.
@@ -95,8 +122,10 @@ can cause failures that need diagnosis.
 - How does parameterization differ from a loop inside one test?
 - Why use Playwright's `expect` for changing UI state?
 - Why copy session-scoped test data before modifying it?
+- Why is checking the cart badge insufficient to prove the correct item was added?
+- Why should expected product prices be independent of the displayed value?
 
 ## Roadmap
 
-Product and cart workflows, Page Objects where useful, API testing, failure
+Cart removal and additional product workflows, Page Objects where useful, API testing, failure
 diagnostics, result persistence, FastAPI, a React dashboard, and GitHub Actions.

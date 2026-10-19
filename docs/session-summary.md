@@ -51,3 +51,26 @@ variables. The suite uses the public SauceDemo test site and requires internet a
 - Suggested Commit: `feat: add visible browser options`.
 - Next Milestone: Product and cart workflow coverage.
 - Dependencies Installed: None.
+
+## Product-to-cart milestone
+
+- Current Phase: Phase 4, Playwright UI automation.
+- Completed: Independent login, product name and price verification, add-to-cart,
+  badge verification, and cart content validation in one user workflow.
+- Concepts Introduced: State transition testing, locators scoped to a product
+  card, explicit expected test data, and checking outcomes beyond a badge count.
+- Files Changed: `tests/ui/test_cart.py`, `README.md`, `docs/session-summary.md`.
+- Tests Added: `test_add_product_to_cart`.
+- Verification: New workflow passed with `--headed --slowmo 200` in 7.51 seconds.
+  Full headless suite passed: nine tests in 16.51 seconds, including all seven
+  authentication cases and the original Python.org smoke test.
+- Tests Failing: None in the verified runs.
+- Architecture: Reused existing fixtures; actions remain visible in the test.
+  No Page Objects or new dependencies were introduced.
+- Suggested Commit: `test: add product-to-cart workflow`.
+- Problems Encountered: None in this milestone.
+- Still Blocked: Nothing.
+- Next Milestone: A separate test that adds an item for itself, removes it from
+  the cart, and verifies that both the cart and badge are empty.
+- Overall Project Progress: Authentication and the first product-to-cart flow
+  work; API, diagnostics, backend, database, dashboard, and CI remain ahead.
