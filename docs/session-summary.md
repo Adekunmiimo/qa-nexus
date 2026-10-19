@@ -74,3 +74,28 @@ variables. The suite uses the public SauceDemo test site and requires internet a
   the cart, and verifies that both the cart and badge are empty.
 - Overall Project Progress: Authentication and the first product-to-cart flow
   work; API, diagnostics, backend, database, dashboard, and CI remain ahead.
+
+## Cart removal milestone
+
+- Current Phase: Phase 4, Playwright UI automation.
+- Completed: Independent removal workflow that logs in, adds its own product,
+  confirms the cart contains it, removes it, and checks the empty cart and badge.
+  Returning to Products also verifies that Add to cart is available again.
+- Concepts Introduced: Arrange, Act, Assert; verifying preconditions before
+  removal; checking that cart and product views agree; reusing locators after
+  navigation without keeping stale element references.
+- Files Changed: `tests/ui/test_cart.py`, `README.md`, `docs/session-summary.md`.
+- Tests Added: `test_remove_product_from_cart`.
+- Verification: Removal passed independently with `--headed --slowmo 200` in
+  5.00 seconds. All ten tests passed headlessly in 23.08 seconds.
+- Tests Failing: None in the verified runs.
+- Architecture: Existing browser and page fixtures reused. Repeated login setup
+  is now a candidate for a fixture in a focused follow-up change.
+- Suggested Commit: `test: add independent cart removal workflow`.
+- Problems Encountered: None in this milestone.
+- Still Blocked: Nothing.
+- Dependencies Installed: None.
+- Next Milestone: Reuse authenticated setup in product workflows, then add logout
+  coverage. Keep authentication tests explicit so their intent remains visible.
+- Overall Project Progress: Seven authentication cases, two independent cart
+  workflows, and the original smoke test pass; later platform phases remain ahead.

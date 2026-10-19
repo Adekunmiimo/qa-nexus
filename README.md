@@ -5,13 +5,14 @@ tests, useful diagnostics, and eventually a results dashboard.
 
 ## Current milestone
 
-Eight SauceDemo UI scenarios using Python, Pytest, and Playwright:
+Nine SauceDemo UI scenarios using Python, Pytest, and Playwright:
 
 - Successful login and navigation to Products
 - Invalid username and invalid password
 - Locked user
 - Empty username, empty password, and both fields empty
 - Add a product to the cart, checking its name, price, badge count, and quantity
+- Remove a product from the cart and verify the empty cart and product button state
 
 The original `test_example.py` remains the initial Python.org smoke test.
 
@@ -40,17 +41,25 @@ To run the original smoke test too:
 .\.venv\Scripts\python.exe -m pytest -v
 ```
 
-## Run the cart workflow
+## Run the cart workflows
 
-After setting the same environment variables, watch the new test:
+After setting the same environment variables, watch both cart tests:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest tests/ui/test_cart.py -v --headed --slowmo 500
 ```
 
-Expected result: **1 passed**. It logs in independently, checks the Sauce Labs
-Backpack costs $29.99, adds it, and verifies one matching item in the cart.
+Expected result: **2 passed**. Each test logs in and adds its own product.
+The addition test checks the Sauce Labs Backpack costs $29.99 and verifies one
+matching cart item. The removal test removes its item, verifies the cart rows and
+badge disappear, then returns to Products and checks Add to cart is available again.
 The browser closes automatically; no purchase is made.
+
+Run only the removal test to confirm it works independently:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/ui/test_cart.py::test_remove_product_from_cart -v --headed --slowmo 500
+```
 
 Run authentication and cart tests together:
 
@@ -58,7 +67,7 @@ Run authentication and cart tests together:
 .\.venv\Scripts\python.exe -m pytest tests/ui -v
 ```
 
-Expected result: **8 passed**, or **9 passed** with `python -m pytest -v`,
+Expected result: **9 passed**, or **10 passed** with `python -m pytest -v`,
 which includes the original Python.org smoke test.
 
 ## Watch the browser
@@ -106,10 +115,11 @@ retry until the expected state appears or their timeout expires; there are no
 fixed sleeps. Rejected logins check both the error message and that the user
 remains on the login page.
 
-The cart test demonstrates state transition testing: an empty cart becomes a cart
-containing one specific product. It scopes actions to the product's card, uses
+The cart tests demonstrate state transition testing: an empty cart becomes a cart
+containing one specific product, and removing the item makes it empty again.
+Each test establishes its own starting state. The tests scope actions to a product's card, use
 SauceDemo's `data-test` attributes where accessible roles are insufficient, and
-checks fixed expected values rather than deriving expectations from the UI.
+check fixed expected values rather than deriving expectations from the UI.
 
 Page Object Model will be introduced when reuse across workflows justifies it.
 This suite depends on a public external site, so network outages and site changes
@@ -124,8 +134,10 @@ can cause failures that need diagnosis.
 - Why copy session-scoped test data before modifying it?
 - Why is checking the cart badge insufficient to prove the correct item was added?
 - Why should expected product prices be independent of the displayed value?
+- Why verify an item exists before testing its removal?
+- How does Arrange, Act, Assert make a state transition test easier to understand?
 
 ## Roadmap
 
-Cart removal and additional product workflows, Page Objects where useful, API testing, failure
+Logout and reusable login setup, Page Objects where useful, API testing, failure
 diagnostics, result persistence, FastAPI, a React dashboard, and GitHub Actions.
