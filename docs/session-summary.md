@@ -19,12 +19,12 @@ Date: 2026-10-19
   after setting the required environment variables.
 - Comment Verification: All seven authentication cases still collect successfully
   after comments were added; browser execution was not repeated for comment edits.
-- Git Commit: This milestone is prepared for `test: add SauceDemo authentication suite`.
-  Use `git log -1 --oneline` to see the resulting commit once created.
-- GitHub Publication: Requested; destination repository URL not yet supplied.
+- Git Commit: `e26398d` — `test: add SauceDemo authentication suite`.
+- GitHub Repository: https://github.com/Adekunmiimo/qa-nexus
+  The committed code and progress notes are prepared for publication on `main`.
 - Problems Encountered: Sandbox initially blocked browser network access.
 - Resolved: Browser inspection and tests ran successfully with approved network access.
-- Still Blocked: GitHub publication awaits the destination repository URL.
+- Still Blocked: None; the GitHub destination has been supplied and verified.
 - Next Milestone: Review the fixtures and parameterized cases, then add basic
   product and cart workflows.
 - Overall Project Progress: Initial authentication automation works; later API,
