@@ -3,7 +3,7 @@ import os
 from collections.abc import Iterator
 
 import pytest
-from playwright.sync_api import Browser, Page, sync_playwright
+from playwright.sync_api import Browser, Page, expect, sync_playwright
 
 
 def non_negative_integer(value: str) -> int:
@@ -89,3 +89,19 @@ def page(browser: Browser) -> Iterator[Page]:
         # finally closes the context and its tabs even if navigation or a test
         # fails. The shared browser stays available for the next test case.
         context.close()
+
+
+@pytest.fixture
+def authenticated_page(page: Page, credentials: dict[str, str]) -> Page:
+    # Fixtures can request other fixtures. Pytest builds this chain for each test:
+    # browser -> page (fresh context) -> authenticated_page (login on that page).
+    # This reuses login instructions, not a logged-in session between tests.
+    page.get_by_placeholder("Username", exact=True).fill(credentials["username"])
+    page.get_by_placeholder("Password", exact=True).fill(credentials["password"])
+    page.get_by_role("button", name="Login", exact=True).click()
+    # Verify the setup worked before handing the page to a cart or logout test.
+    expect(page).to_have_url("https://www.saucedemo.com/inventory.html")
+    expect(page.get_by_text("Products", exact=True)).to_be_visible()
+    # No new resource was created here, so return is sufficient. The underlying
+    # page fixture still owns cleanup, including if login or a later test fails.
+    return page

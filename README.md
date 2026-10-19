@@ -5,7 +5,7 @@ tests, useful diagnostics, and eventually a results dashboard.
 
 ## Current milestone
 
-Nine SauceDemo UI scenarios using Python, Pytest, and Playwright:
+Ten SauceDemo UI scenarios using Python, Pytest, and Playwright:
 
 - Successful login and navigation to Products
 - Invalid username and invalid password
@@ -13,6 +13,7 @@ Nine SauceDemo UI scenarios using Python, Pytest, and Playwright:
 - Empty username, empty password, and both fields empty
 - Add a product to the cart, checking its name, price, badge count, and quantity
 - Remove a product from the cart and verify the empty cart and product button state
+- Logout and reject direct product-page access afterward in the same browser context
 
 The original `test_example.py` remains the initial Python.org smoke test.
 
@@ -67,8 +68,21 @@ Run authentication and cart tests together:
 .\.venv\Scripts\python.exe -m pytest tests/ui -v
 ```
 
-Expected result: **9 passed**, or **10 passed** with `python -m pytest -v`,
+Expected result: **10 passed**, or **11 passed** with `python -m pytest -v`,
 which includes the original Python.org smoke test.
+
+## Watch logout
+
+After setting the same credentials, run:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/ui/test_logout.py -v --headed --slowmo 500
+```
+
+Expected result: **1 passed**. The test logs in, opens the menu, logs out, then
+attempts to reopen Products in the same context. It checks the redirect and
+access-denied message. This covers browser route protection, not server-side
+session or token revocation.
 
 ## Watch the browser
 
@@ -104,11 +118,20 @@ Tests request a fixture by naming it as a function argument.
 - `page` creates a fresh browser context for each test, opens the login page, and
   closes the context afterward, including when a test fails. Contexts isolate
   cookies and browser storage while sharing the browser process.
+- `authenticated_page` requests `page` and `credentials`, logs in, verifies Products
+  is ready, and returns the page. It runs once per test, so cart and logout tests
+  reuse setup instructions while still receiving independent login sessions.
+  Cleanup stays with the underlying `page` fixture.
 
 `tests/ui/test_login.py` keeps actions and assertions visible in the tests.
 Parameterization runs the same behavior with different inputs as separate test
 cases. Invalid-input tests copy credential data before changing it so shared
 fixture data remains unchanged.
+
+Cart and logout tests request `authenticated_page` because login is their setup.
+Authentication tests continue to request `page` and perform login themselves
+because login is the behavior under test. No fixture is marked `autouse`: tests
+explicitly opt into the starting state they need.
 
 Locators use placeholders and button roles. Playwright's `expect` assertions
 retry until the expected state appears or their timeout expires; there are no
@@ -136,8 +159,10 @@ can cause failures that need diagnosis.
 - Why should expected product prices be independent of the displayed value?
 - Why verify an item exists before testing its removal?
 - How does Arrange, Act, Assert make a state transition test easier to understand?
+- How can fixtures depend on other fixtures without sharing login state across tests?
+- Why test a protected page after logout in the same browser context?
 
 ## Roadmap
 
-Logout and reusable login setup, Page Objects where useful, API testing, failure
-diagnostics, result persistence, FastAPI, a React dashboard, and GitHub Actions.
+Failure diagnostics and reports, Page Objects where useful, API testing,
+result persistence, FastAPI, a React dashboard, and GitHub Actions.

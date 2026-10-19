@@ -99,3 +99,31 @@ variables. The suite uses the public SauceDemo test site and requires internet a
   coverage. Keep authentication tests explicit so their intent remains visible.
 - Overall Project Progress: Seven authentication cases, two independent cart
   workflows, and the original smoke test pass; later platform phases remain ahead.
+
+## Authenticated setup and logout milestone
+
+- Current Phase: Phase 4, Playwright UI automation.
+- Completed: Function-scoped `authenticated_page` fixture reused by cart tests
+  and a new logout test. Login tests retain their explicit login actions.
+- Concepts Introduced: Fixture dependency chains, setup reuse without sharing
+  session state, return versus yield, accessible role overrides, and checking
+  protected-page access after logout in the same browser context.
+- Files Changed: `tests/ui/conftest.py`, `tests/ui/test_cart.py`,
+  `tests/ui/test_logout.py`, `README.md`, `docs/session-summary.md`.
+- Tests Added: `test_logout_blocks_product_access`.
+- Verification: Logout passed independently with `--headed --slowmo 200` in
+  5.94 seconds. Full headless suite: eleven passed in 19.07 seconds.
+- Tests Failing: None in the final verified runs.
+- Problems Encountered: Initial logout run could not locate Logout as a link;
+  the browser closed while that action was pending. DOM inspection confirmed
+  SauceDemo explicitly assigns role="button" to the Logout anchor.
+- Resolved: Used the actual accessible button role; the rerun passed.
+- Architecture: Each authenticated page still uses a fresh context. Cleanup
+  remains owned by the page fixture. No Page Objects or dependencies were added.
+- Limitation: Logout coverage checks browser route protection, not server-side
+  session revocation or API authorization.
+- Suggested Commit: `test: reuse authenticated setup and cover logout`.
+- Still Blocked: Nothing.
+- Next Milestone: Screenshots and Playwright traces for failure diagnostics.
+- Overall Project Progress: Ten SauceDemo UI cases plus the original smoke test
+  pass; reporting, API, persistence, backend, dashboard, and CI remain ahead.

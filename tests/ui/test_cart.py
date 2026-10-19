@@ -1,13 +1,10 @@
 from playwright.sync_api import Page, expect
 
 
-def test_add_product_to_cart(page: Page, credentials: dict[str, str]):
-    # This workflow logs in for itself: it must not depend on a login test
-    # running first. The page fixture provides a fresh browser context.
-    page.get_by_placeholder("Username", exact=True).fill(credentials["username"])
-    page.get_by_placeholder("Password", exact=True).fill(credentials["password"])
-    page.get_by_role("button", name="Login", exact=True).click()
-    expect(page).to_have_url("https://www.saucedemo.com/inventory.html")
+def test_add_product_to_cart(authenticated_page: Page):
+    # The fixture logs in independently for this test in a fresh context.
+    # page is a local alias for readability; it is the same supplied Page object.
+    page = authenticated_page
 
     # Fixed expected values describe the behavior we want to prove. Reading the
     # expected price from the UI would allow an incorrect price to pass the test.
@@ -50,13 +47,10 @@ def test_add_product_to_cart(page: Page, credentials: dict[str, str]):
     expect(cart_items.locator('[data-test="item-quantity"]')).to_have_text("1")
 
 
-def test_remove_product_from_cart(page: Page, credentials: dict[str, str]):
-    # Arrange our own starting state: this test must also pass when run alone.
-    # A fresh context means the previous add-to-cart test cannot supply our item.
-    page.get_by_placeholder("Username", exact=True).fill(credentials["username"])
-    page.get_by_placeholder("Password", exact=True).fill(credentials["password"])
-    page.get_by_role("button", name="Login", exact=True).click()
-    expect(page).to_have_url("https://www.saucedemo.com/inventory.html")
+def test_remove_product_from_cart(authenticated_page: Page):
+    # Login setup is reusable, but this test still adds its own item. It must
+    # pass alone without relying on the add-to-cart test having run first.
+    page = authenticated_page
 
     product_name = "Sauce Labs Backpack"
     product = page.locator('[data-test="inventory-item"]').filter(
