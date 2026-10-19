@@ -1,8 +1,35 @@
+import argparse
 import os
 from collections.abc import Iterator
 
 import pytest
 from playwright.sync_api import Browser, Page, sync_playwright
+
+
+def non_negative_integer(value: str) -> int:
+    # Reject invalid delays at command parsing, before opening a browser.
+    delay = int(value)
+    if delay < 0:
+        raise argparse.ArgumentTypeError("delay must be zero or greater")
+    return delay
+
+
+def pytest_addoption(parser: pytest.Parser) -> None:
+    # This Pytest hook registers our CLI options; pytest-playwright is not needed.
+    group = parser.getgroup("QA Nexus browser options")
+    group.addoption(
+        "--headed",
+        action="store_true",
+        default=False,
+        help="Show the browser window for tests using the UI browser fixture.",
+    )
+    group.addoption(
+        "--slowmo",
+        type=non_negative_integer,
+        default=0,
+        metavar="MILLISECONDS",
+        help="Delay Playwright operations for observation (default: 0).",
+    )
 
 
 # Pytest discovers fixtures in conftest.py automatically for tests in this folder
@@ -30,11 +57,16 @@ def credentials() -> dict[str, str]:
 
 
 @pytest.fixture(scope="session")
-def browser() -> Iterator[Browser]:
+def browser(pytestconfig: pytest.Config) -> Iterator[Browser]:
+    # pytestconfig is a built-in fixture that gives access to CLI option values.
     # The context manager starts Playwright and stops it when this block exits.
     with sync_playwright() as playwright:
-        # Chromium runs headless (without a visible window) by default.
-        browser = playwright.chromium.launch()
+        # --headed makes headless False, opening a visible browser window.
+        # slow_mo is a viewing aid, not a replacement for Playwright's waiting.
+        browser = playwright.chromium.launch(
+            headless=not pytestconfig.getoption("--headed"),
+            slow_mo=pytestconfig.getoption("--slowmo"),
+        )
         # yield supplies the browser to dependent fixtures, then pauses here.
         # After those fixtures finish, Pytest resumes here for cleanup.
         # Iterator[Browser] describes a generator that yields a Browser object.

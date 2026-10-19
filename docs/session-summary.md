@@ -32,3 +32,22 @@ Date: 2026-10-19
 
 No dependencies were installed. Login credentials are supplied through environment
 variables. The suite uses the public SauceDemo test site and requires internet access.
+
+## Visible browser milestone
+
+- Completed: Custom `--headed` and `--slowmo MILLISECONDS` options in the UI
+  browser fixture, with explanatory comments and README commands.
+- Architecture: Headless execution remains the default. CLI options configure the
+  shared browser; per-test contexts continue to isolate browser state.
+- Files Changed: `tests/ui/conftest.py`, `README.md`, `docs/session-summary.md`.
+- Verification: All seven authentication cases passed with `--headed --slowmo 100`
+  in 21.64 seconds. Successful login also passed with default headless settings
+  in 6.71 seconds. A negative slow-motion delay was rejected before test execution.
+- Tests Added: None; existing authentication cases validate both launch modes.
+- Concepts Introduced: Pytest CLI hooks, the built-in `pytestconfig` fixture,
+  headed versus headless execution, and slow motion for observation.
+- Scope: These options apply to tests using the UI browser fixture; the original
+  standalone Python.org test is unchanged.
+- Suggested Commit: `feat: add visible browser options`.
+- Next Milestone: Product and cart workflow coverage.
+- Dependencies Installed: None.
