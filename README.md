@@ -107,6 +107,44 @@ custom options for the UI browser fixture; the original `test_example.py` launch
 its own browser and does not use them. Slow motion helps observation; assertions
 still use Playwright's waiting behavior to check the result.
 
+## Failure diagnostics
+
+Tests using the UI `page` fixture now record Playwright traces automatically.
+When a test body or a dependent setup fixture fails, cleanup saves:
+
+```text
+reports/<run-id>/<test-name-and-id>/
+    screenshot.png
+    trace.zip
+```
+
+The terminal prints the diagnostics directory in captured teardown output.
+Open `screenshot.png` to see the page at failure. Open a trace locally with:
+
+```powershell
+.\.venv\Scripts\python.exe -m playwright show-trace "reports\<run-id>\<test-name-and-id>\trace.zip"
+```
+
+Replace the example path with the actual generated path. Trace Viewer lets you
+inspect recorded browser actions, DOM snapshots, screenshots, and network activity.
+It records browser activity, not every Python assertion; use the Pytest traceback
+alongside the trace to understand the failure.
+
+Passing tests discard their traces and do not create report directories. Run IDs
+and test IDs prevent different failures from overwriting each other. Diagnostic
+files may include submitted form data and network details; `reports/` is excluded
+from Git and is not pushed to GitHub.
+
+Capture is best effort if a page or browser has crashed: a screenshot may be
+unavailable, and capture errors are printed without replacing the test error.
+Failures before a page exists cannot have page screenshots. Errors in cleanup
+after artifact capture are outside this increment's coverage. The standalone
+Python.org smoke test does not use these fixtures and has no automatic diagnostics.
+
+No reporting plugin was installed. These are debugging artifacts, not an HTML
+test-result report. A temporary intentional-failure probe validated capture and
+was removed; the normal suite still contains eleven tests.
+
 ## How the tests work
 
 `tests/ui/conftest.py` provides fixtures that Pytest discovers automatically.
@@ -122,6 +160,9 @@ Tests request a fixture by naming it as a function argument.
   is ready, and returns the page. It runs once per test, so cart and logout tests
   reuse setup instructions while still receiving independent login sessions.
   Cleanup stays with the underlying `page` fixture.
+- `pytest_runtest_makereport` remembers each test's setup/body results in Pytest's
+  stash. The page fixture reads them before closing the context to decide whether
+  to save evidence. Recording starts before navigation to include login setup.
 
 `tests/ui/test_login.py` keeps actions and assertions visible in the tests.
 Parameterization runs the same behavior with different inputs as separate test
@@ -161,8 +202,10 @@ can cause failures that need diagnosis.
 - How does Arrange, Act, Assert make a state transition test easier to understand?
 - How can fixtures depend on other fixtures without sharing login state across tests?
 - Why test a protected page after logout in the same browser context?
+- What can a trace show that a screenshot cannot?
+- Why capture diagnostics before closing the browser context?
 
 ## Roadmap
 
-Failure diagnostics and reports, Page Objects where useful, API testing,
+Test-result reports, Page Objects where useful, API testing,
 result persistence, FastAPI, a React dashboard, and GitHub Actions.

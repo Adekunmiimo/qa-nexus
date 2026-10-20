@@ -127,3 +127,35 @@ variables. The suite uses the public SauceDemo test site and requires internet a
 - Next Milestone: Screenshots and Playwright traces for failure diagnostics.
 - Overall Project Progress: Ten SauceDemo UI cases plus the original smoke test
   pass; reporting, API, persistence, backend, dashboard, and CI remain ahead.
+
+## Failure diagnostics milestone - 2026-10-20
+
+- Current Phase: Phase 7's first diagnostics increment, building on the UI suite.
+- Completed: Record browser traces before navigation; save screenshots and traces
+  on test-body and dependent-fixture setup failures before closing the context.
+  Successful tests discard traces. Generated reports are excluded from Git.
+- Concepts Introduced: Pytest setup/call/teardown reports, hook wrappers, per-item
+  stash storage, diagnostic capture before teardown, and local Trace Viewer.
+- Files Changed: `tests/ui/conftest.py`, `.gitignore`, `README.md`,
+  `docs/session-summary.md`.
+- Tests Added: No permanent tests. A temporary probe module was run and removed.
+- Diagnostic Verification: Intentional assertion and setup failures each produced
+  valid PNG screenshots and trace ZIPs. A closed-page failure retained its original
+  assertion and saved a trace despite the unavailable screenshot. All three ZIPs
+  passed archive-integrity checks and contained trace events.
+- Normal Suite Verification: Eleven passed in 20.09 seconds after removing probes.
+- Tests Failing: None in the normal suite. The probe's two failures and one setup
+  error were deliberate checks, not application regressions.
+- Architecture: Run-specific directories and sanitized test names plus ID hashes
+  avoid overwriting artifacts. Diagnostics are best effort for crashed pages.
+- Limitations: No screenshot before a page exists; later cleanup failures are not
+  captured. The standalone Python.org test does not use the UI diagnostics fixture.
+  Browser traces complement Python tracebacks rather than recording every assertion.
+- Dependencies Installed: None.
+- Suggested Commit: `feat: capture screenshots and traces on UI test failure`.
+- Still Blocked: Nothing.
+- Next Milestone: Introduce a readable test-result report, explaining its purpose
+  and dependency before installation, or review a captured trace together first.
+- Overall Project Progress: Ten SauceDemo cases and one original smoke test pass.
+  UI diagnostics now work; result reporting, API, persistence, backend, dashboard,
+  and CI work remain ahead.
