@@ -159,3 +159,33 @@ variables. The suite uses the public SauceDemo test site and requires internet a
 - Overall Project Progress: Ten SauceDemo cases and one original smoke test pass.
   UI diagnostics now work; result reporting, API, persistence, backend, dashboard,
   and CI work remain ahead.
+
+## HTML reporting milestone - 2026-10-20
+
+- Current Phase: Phase 7, reporting and failure diagnostics.
+- Completed: Installed pytest-html 4.2.0 in the existing virtual environment and
+  generated a self-contained `reports/report.html` for the complete test suite.
+- Dependencies Added: Direct dependency `pytest-html`; required supporting
+  packages Jinja2 3.1.6, MarkupSafe 3.0.4, and pytest-metadata 3.1.1 were installed
+  automatically. Existing Pytest and Playwright versions were unchanged.
+- Files Changed: `requirements.txt`, `README.md`, `docs/session-summary.md`.
+- Architecture: Report generation is opt-in through CLI flags. requirements.txt
+  pins only the three direct dependencies needed for the current phase.
+  HTML reports remain ignored by Git under reports/.
+- Concepts Introduced: Pytest plugins, direct versus transitive dependencies,
+  self-contained HTML assets, summary reporting versus failure diagnostics.
+- Tests Added: None; this milestone reports existing tests.
+- Tests Passing: Eleven in 22.85 seconds with HTML reporting enabled.
+- Tests Failing: None in the verified suite.
+- Report Verification: Opened the generated file in headless Chromium; confirmed
+  eleven passed results, eleven result rows, and working expandable details.
+  No external script or stylesheet assets were required. pip check passed.
+- Limitations: Screenshots and traces remain separate files rather than report
+  attachments. The documented default filename is overwritten on subsequent runs.
+- Suggested Commit: `feat: add HTML test reporting and dependency manifest`.
+- Still Blocked: Nothing.
+- Next Milestone: Review the HTML report, then introduce Page Objects where
+  repeated product actions justify them before expanding test coverage.
+- Overall Project Progress: UI authentication, cart and logout coverage,
+  failure screenshots/traces, and readable HTML reporting work. API, persistence,
+  backend, dashboard, and CI milestones remain ahead.
