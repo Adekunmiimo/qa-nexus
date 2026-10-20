@@ -208,7 +208,8 @@ Tests request a fixture by naming it as a function argument.
   stash. The page fixture reads them before closing the context to decide whether
   to save evidence. Recording starts before navigation to include login setup.
 
-`tests/ui/test_login.py` keeps actions and assertions visible in the tests.
+`tests/ui/test_login.py` keeps scenario intent and assertions visible in the tests.
+It calls `LoginPage.login` for the shared form interaction.
 Parameterization runs the same behavior with different inputs as separate test
 cases. Invalid-input tests copy credential data before changing it so shared
 fixture data remains unchanged.
@@ -229,12 +230,22 @@ Each test establishes its own starting state. The tests scope actions to a produ
 SauceDemo's `data-test` attributes where accessible roles are insufficient, and
 check fixed expected values rather than deriving expectations from the UI.
 
-Page Object Model will be introduced when reuse across workflows justifies it.
+`pages/login_page.py` is our first small Page Object. It centralizes login
+locators and the fill/submit action without creating browser resources, navigating,
+or assuming the login succeeds. Tests own scenario assertions; the authenticated
+fixture checks successful login as its setup precondition. Logout tests also use
+the centralized login-form locators. Cart interactions remain explicit for now.
 This suite depends on a public external site, so network outages and site changes
 can cause failures that need diagnosis.
 
 ## Interview practice
 
+See [sample answers, explanations, and QA Nexus examples](docs/interview-preparation.md)
+for every question below, plus the new Page Object Model topics. Practise the
+answers in your own words and connect them to the actual code.
+
+- What problem does Page Object Model solve, and when can it add unnecessary complexity?
+- Why keep scenario assertions outside the reusable login action?
 - What is a fixture, and how does `yield` support teardown?
 - Why share a browser but create a new context for each test?
 - How does parameterization differ from a loop inside one test?
@@ -253,5 +264,5 @@ can cause failures that need diagnosis.
 
 ## Roadmap
 
-Page Objects where useful, API testing,
+Additional Page Objects where useful, API testing,
 result persistence, FastAPI, a React dashboard, and GitHub Actions.

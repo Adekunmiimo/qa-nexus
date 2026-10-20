@@ -189,3 +189,42 @@ variables. The suite uses the public SauceDemo test site and requires internet a
 - Overall Project Progress: UI authentication, cart and logout coverage,
   failure screenshots/traces, and readable HTML reporting work. API, persistence,
   backend, dashboard, and CI milestones remain ahead.
+
+## Login Page Object and session checkpoint - 2026-10-20
+
+- Current Phase: Phase 5's first maintainability increment, with initial Phase 7
+  diagnostics and reporting already working.
+- Completed: Small LoginPage class holding form locators and the login action;
+  authentication tests and authenticated setup reuse it. Logout checks reuse the
+  login-form locators. Scenario assertions remain visible in tests.
+- Concepts Introduced: Classes, self and __init__, wrapping an existing Page,
+  Page Object Model, and separating interaction from expected outcomes.
+- Learning Material: `docs/interview-preparation.md` now gives sample answers,
+  explanations, and QA Nexus examples for the README's interview questions,
+  including POM benefits, tradeoffs, and why login does not assert success.
+- Files Changed: `pages/__init__.py`, `pages/login_page.py`,
+  `tests/ui/conftest.py`, `tests/ui/test_login.py`, `tests/ui/test_logout.py`,
+  `README.md`, `docs/interview-preparation.md`, `docs/session-summary.md`.
+- Tests Added: None; existing scenarios verify the refactor.
+- Tests Passing: Eleven in 24.86 seconds; reports/report.html regenerated.
+- Tests Failing: None in the verified run.
+- Dependencies Installed: None.
+- Suggested Commit: `refactor: introduce login page object and interview guide`.
+- Problems Encountered: None in this milestone.
+- Still Blocked: Nothing.
+- Overall Project Progress: Authentication, independent cart addition/removal,
+  logout route protection, screenshots/traces on failure, and HTML reporting work.
+  The first Page Object is in place. API, persistence, backend, React dashboard,
+  and CI are not yet implemented.
+- Next Milestone: Review LoginPage and the fixture-versus-Page-Object distinction,
+  then select a small API-testing increment or further UI coverage together.
+
+### Resume here
+
+1. Read `pages/login_page.py`, then its callers in `test_login.py` and the
+   authenticated_page fixture. Fixtures manage test setup and resource lifetime;
+   the Page Object groups page interactions and does not own the browser.
+2. Read the first three Q&As in `docs/interview-preparation.md`.
+3. Set SAUCEDEMO_USERNAME and SAUCEDEMO_PASSWORD again if using a new terminal.
+4. Run `python -m pytest -v --html=reports/report.html --self-contained-html`.
+   Expected: eleven passed. Open it with `Start-Process .\reports\report.html`.

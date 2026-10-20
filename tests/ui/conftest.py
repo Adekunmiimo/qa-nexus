@@ -10,6 +10,8 @@ from uuid import uuid4
 import pytest
 from playwright.sync_api import Browser, Error, Page, expect, sync_playwright
 
+from pages.login_page import LoginPage
+
 
 # Pytest's stash stores data on a test item without inventing custom attributes.
 TEST_REPORTS = pytest.StashKey[dict[str, pytest.TestReport]]()
@@ -165,9 +167,8 @@ def authenticated_page(page: Page, credentials: dict[str, str]) -> Page:
     # Fixtures can request other fixtures. Pytest builds this chain for each test:
     # browser -> page (fresh context) -> authenticated_page (login on that page).
     # This reuses login instructions, not a logged-in session between tests.
-    page.get_by_placeholder("Username", exact=True).fill(credentials["username"])
-    page.get_by_placeholder("Password", exact=True).fill(credentials["password"])
-    page.get_by_role("button", name="Login", exact=True).click()
+    # Reuse the action while this fixture owns the successful-login precondition.
+    LoginPage(page).login(credentials["username"], credentials["password"])
     # Verify the setup worked before handing the page to a cart or logout test.
     expect(page).to_have_url("https://www.saucedemo.com/inventory.html")
     expect(page.get_by_text("Products", exact=True)).to_be_visible()

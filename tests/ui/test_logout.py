@@ -1,5 +1,7 @@
 from playwright.sync_api import Page, expect
 
+from pages.login_page import LoginPage
+
 
 def test_logout_blocks_product_access(authenticated_page: Page):
     # Start logged in through the function-scoped fixture. Other authentication
@@ -12,9 +14,10 @@ def test_logout_blocks_product_access(authenticated_page: Page):
 
     # Verify the visible result of logout, not just that the menu link was clicked.
     expect(page).to_have_url("https://www.saucedemo.com/")
-    expect(page.get_by_placeholder("Username", exact=True)).to_be_visible()
-    expect(page.get_by_placeholder("Password", exact=True)).to_be_visible()
-    expect(page.get_by_role("button", name="Login", exact=True)).to_be_visible()
+    login_page = LoginPage(page)
+    expect(login_page.username_input).to_be_visible()
+    expect(login_page.password_input).to_be_visible()
+    expect(login_page.login_button).to_be_visible()
 
     # A redirect alone does not prove access was removed. Attempt to reopen the
     # protected screen in the SAME context, with no fresh context to mask a bug.

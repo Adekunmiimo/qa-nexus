@@ -1,22 +1,23 @@
 import pytest
 from playwright.sync_api import Page, expect
 
+from pages.login_page import LoginPage
+
 
 # Pytest discovers functions named test_*. The arguments request fixtures from
 # conftest.py, so each test receives a fresh page and the configured credentials.
 def test_successful_login(page: Page, credentials: dict[str, str]):
-    # Match the input's placeholder and the button's accessible role/name.
-    # exact=True prevents partial matches; fill() replaces the input's value.
-    page.get_by_placeholder("Username", exact=True).fill(credentials["username"])
-    page.get_by_placeholder("Password", exact=True).fill(credentials["password"])
-    page.get_by_role("button", name="Login", exact=True).click()
+    # The Page Object handles how to log in; this test still decides what counts
+    # as success. Constructing it wraps this test's existing, isolated page.
+    login_page = LoginPage(page)
+    login_page.login(credentials["username"], credentials["password"])
 
     # expect retries until the expected state appears or its timeout expires.
     # Verify the destination and visible content, rather than just that we clicked.
     expect(page).to_have_url("https://www.saucedemo.com/inventory.html")
     expect(page.get_by_text("Products", exact=True)).to_be_visible()
     # A count of zero checks that the Login button is absent from the page.
-    expect(page.get_by_role("button", name="Login", exact=True)).to_have_count(0)
+    expect(login_page.login_button).to_have_count(0)
 
 
 # Run this function as two separate test cases, changing only one field each time.
@@ -30,32 +31,31 @@ def test_invalid_credentials(
     login_data = credentials.copy()
     # Keep the other field valid so each case isolates one invalid input.
     login_data[invalid_field] += "_invalid"
-    page.get_by_placeholder("Username", exact=True).fill(login_data["username"])
-    page.get_by_placeholder("Password", exact=True).fill(login_data["password"])
-    page.get_by_role("button", name="Login", exact=True).click()
+    login_page = LoginPage(page)
+    login_page.login(login_data["username"], login_data["password"])
 
     # The correct rejection message proves why login failed.
-    expect(page.get_by_text(
+    expect(login_page.error_message).to_have_text(
         "Epic sadface: Username and password do not match any user in this service",
-        exact=True,
-    )).to_be_visible()
+    )
+    expect(login_page.error_message).to_be_visible()
     # Also confirm the user remains on the login screen.
     expect(page).to_have_url("https://www.saucedemo.com/")
-    expect(page.get_by_role("button", name="Login", exact=True)).to_be_visible()
+    expect(login_page.login_button).to_be_visible()
 
 
 def test_locked_user(page: Page, credentials: dict[str, str]):
     # This is a public SauceDemo test account. Use the correct demo password
     # to verify account lockout rather than incorrect-password handling.
-    page.get_by_placeholder("Username", exact=True).fill("locked_out_user")
-    page.get_by_placeholder("Password", exact=True).fill(credentials["password"])
-    page.get_by_role("button", name="Login", exact=True).click()
+    login_page = LoginPage(page)
+    login_page.login("locked_out_user", credentials["password"])
 
-    expect(page.get_by_text(
-        "Epic sadface: Sorry, this user has been locked out.", exact=True
-    )).to_be_visible()
+    expect(login_page.error_message).to_have_text(
+        "Epic sadface: Sorry, this user has been locked out."
+    )
+    expect(login_page.error_message).to_be_visible()
     expect(page).to_have_url("https://www.saucedemo.com/")
-    expect(page.get_by_role("button", name="Login", exact=True)).to_be_visible()
+    expect(login_page.login_button).to_be_visible()
 
 
 # Each row becomes an independent test with its own fresh browser context.
@@ -80,11 +80,11 @@ def test_required_fields(
     # according to this case's parameters.
     username = "" if empty_username else credentials["username"]
     password = "" if empty_password else credentials["password"]
-    page.get_by_placeholder("Username", exact=True).fill(username)
-    page.get_by_placeholder("Password", exact=True).fill(password)
-    page.get_by_role("button", name="Login", exact=True).click()
+    login_page = LoginPage(page)
+    login_page.login(username, password)
 
     # The f-string inserts this case's expected validation message.
-    expect(page.get_by_text(f"Epic sadface: {expected_error}", exact=True)).to_be_visible()
+    expect(login_page.error_message).to_have_text(f"Epic sadface: {expected_error}")
+    expect(login_page.error_message).to_be_visible()
     expect(page).to_have_url("https://www.saucedemo.com/")
-    expect(page.get_by_role("button", name="Login", exact=True)).to_be_visible()
+    expect(login_page.login_button).to_be_visible()
