@@ -228,3 +228,23 @@ variables. The suite uses the public SauceDemo test site and requires internet a
 3. Set SAUCEDEMO_USERNAME and SAUCEDEMO_PASSWORD again if using a new terminal.
 4. Run `python -m pytest -v --html=reports/report.html --self-contained-html`.
    Expected: eleven passed. Open it with `Start-Process .\reports\report.html`.
+
+## Project learning guide - 2026-10-20
+
+- Completed: `docs/project-concepts-guide.md` explains the current architecture,
+  Python syntax, environment/dependency management, testing terms, Pytest fixtures
+  and hooks, Playwright, POM, diagnostics, reports, commands, and Git/GitHub.
+- Learning Structure: Definitions are connected to actual files and examples.
+  Includes a complete cart-test execution walkthrough, reading map, self-check
+  questions, and a staged study plan. Planned platform concepts are labelled
+  separately from completed features.
+- Files Changed: `docs/project-concepts-guide.md`, `README.md`,
+  `docs/interview-preparation.md`, `docs/session-summary.md`.
+- Verification: Reviewed against current code and checked local Markdown links.
+  No executable code changed; browser tests were not rerun for documentation.
+- Previous Code Verification: Eleven tests passed after the LoginPage refactor.
+- Dependencies Installed: None.
+- Suggested Commit: `docs: add comprehensive project concepts study guide`.
+- Still Blocked: Nothing.
+- Next Milestone: Study the guide at your own pace, starting with test behavior,
+  browser/context/page, fixtures, and LoginPage before the diagnostic hook code.

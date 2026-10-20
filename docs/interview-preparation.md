@@ -3,6 +3,9 @@
 These are sample answers to practise in your own words. They describe what we
 have implemented; they do not imply that every planned platform feature exists.
 
+For definitions, Python syntax, fixture execution flow, and a study plan, read
+the [project concepts guide](project-concepts-guide.md) alongside these answers.
+
 ## What problem does Page Object Model solve?
 
 **Sample answer:** Page Object Model groups a page's locators and reusable actions

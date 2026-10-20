@@ -3,6 +3,13 @@
 A Quality Engineering portfolio project, built progressively to connect automated
 tests, useful diagnostics, and eventually a results dashboard.
 
+## Learning resources
+
+Start with the [project concepts guide](docs/project-concepts-guide.md) for term
+definitions, explanations of the actual code, the full execution flow, and a study
+plan. Use the [interview guide](docs/interview-preparation.md) for sample answers
+and the [session summary](docs/session-summary.md) to resume development.
+
 ## Current milestone
 
 Ten SauceDemo UI scenarios using Python, Pytest, and Playwright:
